@@ -44,6 +44,8 @@ fn run_action(action: &str) -> Result<String, String> {
         player.checked_next().map_err(|e| format!("Could not control player: {}", e))?;
     } else if action == "previous" {
         player.checked_previous().map_err(|e| format!("Could not control player: {}", e))?;
+    } else if action == "stop" {
+        player.checked_stop().map_err(|e| format!("Could not control player: {}", e))?;
     }
 
     Ok(format!("Action {} run", action))
