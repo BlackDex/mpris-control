@@ -23,7 +23,7 @@ fn main() {
             }        
         }
     } else {
-        println!("No action has been given!\nPlease use, toggle, play, pause, next or previous");
+        println!("No action has been given!\nPlease use, toggle, play, pause, stop, next or previous");
     }
 }
 

@@ -17,9 +17,19 @@ mpris-control play
 # Pause
 mpris-control pause
 
+# Stop
+mpris-control stop
+
 # Next track
 mpris-control next
 
 # Previous track
 mpris-control previous
+```
+
+## Notes
+Some packages are needed to build some external crates.<br>
+```bash
+# Ubuntu/Debian
+apt install libdbus-1-dev
 ```
