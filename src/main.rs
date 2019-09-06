@@ -42,33 +42,37 @@ fn run_action(action: &str, ignored_player: &str) -> Result<String, String> {
 
     players.retain(|x| x.identity() != ignored_player);
 
-    if action == "toggle" {
-        players[0]
-            .checked_play_pause()
-            .map_err(|e| format!("Could not control player: {}", e))?;
-    } else if action == "play" {
-        players[0]
-            .checked_play()
-            .map_err(|e| format!("Could not control player: {}", e))?;
-    } else if action == "pause" {
-        players[0]
-            .checked_pause()
-            .map_err(|e| format!("Could not control player: {}", e))?;
-    } else if action == "next" {
-        players[0]
-            .checked_next()
-            .map_err(|e| format!("Could not control player: {}", e))?;
-    } else if action == "previous" {
-        players[0]
-            .checked_previous()
-            .map_err(|e| format!("Could not control player: {}", e))?;
-    } else if action == "stop" {
-        players[0]
-            .checked_stop()
-            .map_err(|e| format!("Could not control player: {}", e))?;
-    } else {
-        return Err(format!("Unrecognized option: {}", action));
-    }
+    if players.len() > 0 {
+        if action == "toggle" {
+            players[0]
+                .checked_play_pause()
+                .map_err(|e| format!("Could not control player: {}", e))?;
+        } else if action == "play" {
+            players[0]
+                .checked_play()
+                .map_err(|e| format!("Could not control player: {}", e))?;
+        } else if action == "pause" {
+            players[0]
+                .checked_pause()
+                .map_err(|e| format!("Could not control player: {}", e))?;
+        } else if action == "next" {
+            players[0]
+                .checked_next()
+                .map_err(|e| format!("Could not control player: {}", e))?;
+        } else if action == "previous" {
+            players[0]
+                .checked_previous()
+                .map_err(|e| format!("Could not control player: {}", e))?;
+        } else if action == "stop" {
+            players[0]
+                .checked_stop()
+                .map_err(|e| format!("Could not control player: {}", e))?;
+        } else {
+            return Err(format!("Unrecognized option: {}", action));
+        }
 
-    Ok(format!("Action {} run", action))
+        Ok(format!("Action {} run", action))
+    } else {
+        return Err(format!("No players found"));
+    }
 }
