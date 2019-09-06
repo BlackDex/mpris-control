@@ -12,6 +12,7 @@ publish = false
 
 [dependencies]
 mpris = "2.0.0-rc1"
+clap = "2"
 
 # [patch.crates-io]
 # mpris = { git = 'https://github.com/Mange/mpris-rs', rev = '4e1f06de3edc865970e5107bd34b2fb40699d03b' }
