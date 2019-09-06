@@ -13,7 +13,7 @@ fn main() {
         ignored_player = if args.len() == 3 { &args[2] } else { "" };
     } else {
         eprintln!(
-            "No action has been given!\nPlease use, toggle, play, pause, stop, next or previous"
+            "Usage: mpris-control {{toggle|play|pause|next|previous|stop}} [player_to_ignore]"
         );
         std::process::exit(1);
     }
