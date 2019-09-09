@@ -1,5 +1,12 @@
 # mpris-control
-A small application to control mpris-2 mediaplayers like spotify, vlc, rhythmbox etc..<br>
+
+[![GitHub Release](https://img.shields.io/github/v/release/BlackDex/mpris-control.svg)](https://github.com/BlackDex/mpris-control/releases/latest)
+[![GitHub Issues](https://img.shields.io/github/issues/BlackDex/mpris-control)](https://github.com/BlackDex/mpris-control/issues)
+[![Dependency status](https://deps.rs/repo/github/BlackDex/mpris-control/status.svg)](https://deps.rs/repo/github/BlackDex/mpris-control)
+[![GPL-3.0 Licensed](https://img.shields.io/github/license/BlackDex/mpris-control.svg)](https://github.com/BlackDex/mpris-control/blob/master/LICENSE)
+
+
+A small application to control mpris-2 mediaplayers like spotify, vlc, rhythmbox, chromium etc..<br>
 <br>
 I Created this because the spotify-app (snap) didn't seem to work with the default media key's configuration of Ubuntu 18.04.<br>
 <br>
@@ -8,23 +15,58 @@ If you encounter any issues please report them in the issues section.<br>
 <br>
 **Simple usage:**
 ```bash
-# Toggle play/pause
-mpris-control toggle
+mpris-control 0.3.0
+BlackDex (https://github.com/BlackDex/mpris-control/)
+Control MPRIS enabled media players
 
-# Play
+USAGE:
+    mpris-control [FLAGS] [OPTIONS] <SUBCOMMAND>
+
+FLAGS:
+    -a, --all        Controll all players instead of only the filtered or first one
+    -h, --help       Prints help information
+    -V, --version    Prints version information
+
+OPTIONS:
+    -i, --ignore <IGNORE>    List of players to ignore separated by commas
+    -t, --target <TARGET>    List of player to control separated by commas
+
+SUBCOMMANDS:
+    help        Prints this message or the help of the given subcommand(s)
+    list        List of players to be controlled (use --all to show all active players)
+    next        Next song
+    pause       Pause
+    play        Play
+    previous    Previous song
+    stop        Stop playback
+    toggle      Toggle playback
+
+# Examples
+
+# Trigger action for "active" player (First in the list only)
 mpris-control play
 
-# Pause
-mpris-control pause
+# List all the players it can find
+mpris-control --all list
 
-# Stop
-mpris-control stop
+# Stop all players
+mpris-control --all stop
 
-# Next track
-mpris-control next
+# Ignore specific players: This will ignore both VLC and Chromium, but triggers all others
+mpris-control --ignore "VLC media player","Chromium" play
 
-# Previous track
-mpris-control previous
+# Target specific players: This will target only Spotify
+mpris-control --target Spotify toggle
+
+# OR
+mpris-control --target Spotify,"VLC media player", pause
+
+# To check if a filter works, you can use "list" command with the --target or --ignore options
+mpris-control --ignore Spotify list
+
+# OR
+mpris-control --target Spotify list
+
 ```
 
 ## Notes
