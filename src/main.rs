@@ -4,7 +4,7 @@ use mpris::PlayerFinder;
 
 fn main() {
     let matches = App::new("mpris-control")
-        .version("0.3.0")
+        .version("0.3.1")
         .author("BlackDex (https://github.com/BlackDex/mpris-control/)")
         .about("Control MPRIS enabled media players")
         .setting(AppSettings::SubcommandRequiredElseHelp)
@@ -68,9 +68,11 @@ fn main() {
     match run_action(action, ignore, target, control_all) {
         Ok(msg) => {
             println!("{}", msg);
+            println!();
         }
         Err(err) => {
             eprintln!("{}", err);
+            eprintln!();
         }
     }
 }
@@ -82,6 +84,11 @@ fn run_action(action: &str, ignore: &str, target: &str, control_all: bool) -> Re
     let mut players = player_finder
         .find_all()
         .map_err(|e| format!("Could not find any player: {}", e))?;
+
+    // 
+    if players.is_empty() {
+        return Err("No MPRIS players found".to_string());
+    }
 
     // Check if we need to list all players which we can control, in which case we skip filtering.
     if !control_all {
