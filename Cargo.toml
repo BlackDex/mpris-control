@@ -1,6 +1,6 @@
 [package]
 name = "mpris-control"
-version = "0.3.1"
+version = "0.3.2"
 authors = ["BlackDex"]
 edition = "2018"
 
@@ -10,11 +10,15 @@ license = "GPL-3.0-only"
 publish = false
 
 [dependencies]
-mpris = "2.0.0-rc1"
+mpris = "2.0.0-rc2"
 clap = "2"
+
+#[patch.crates-io]
+#mpris = { path = "/root/rust/mpris-rs" }
 
 [profile.release]
 lto = true
-opt-level = "s"
+opt-level = "z"
 codegen-units = 1
-inline-threshold = 275
+panic = "abort"
+#inline-threshold = 275

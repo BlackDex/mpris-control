@@ -4,7 +4,7 @@ use mpris::PlayerFinder;
 
 fn main() {
     let matches = App::new("mpris-control")
-        .version("0.3.1")
+        .version("0.3.2")
         .author("BlackDex (https://github.com/BlackDex/mpris-control/)")
         .about("Control MPRIS enabled media players")
         .setting(AppSettings::SubcommandRequiredElseHelp)
