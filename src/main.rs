@@ -1,91 +1,76 @@
-//src main.rs
-use clap::{App, AppSettings, Arg, SubCommand};
+#![forbid(unsafe_code)]
+#![warn(rust_2018_idioms)]
+#![warn(rust_2021_compatibility)]
 use mpris::PlayerFinder;
+use pico_args::Arguments;
 
 fn main() {
-    let matches = App::new("mpris-control")
-        .version("0.3.2")
-        .author("BlackDex (https://github.com/BlackDex/mpris-control/)")
-        .about("Control MPRIS enabled media players")
-        .setting(AppSettings::SubcommandRequiredElseHelp)
-        .setting(AppSettings::InferSubcommands)
-        .subcommand(SubCommand::with_name("play").about("Play"))
-        .subcommand(SubCommand::with_name("pause").about("Pause"))
-        .subcommand(SubCommand::with_name("next").about("Next song"))
-        .subcommand(SubCommand::with_name("previous").about("Previous song"))
-        .subcommand(SubCommand::with_name("stop").about("Stop playback"))
-        .subcommand(SubCommand::with_name("toggle").about("Toggle playback"))
-        .subcommand(SubCommand::with_name("list").about("List of players to be controlled (use --all to show all active players)"))
-        .arg(
-            Arg::with_name("control_all")
-                .short("a")
-                .long("all")
-                .help("Controll all players instead of only the filtered or first one")
-                .takes_value(false)
-                .multiple(false)
-                .conflicts_with("ignore")
-                .conflicts_with("target")
-                .required(false),
-        )
-        .arg(
-            Arg::with_name("ignore")
-                .short("i")
-                .long("ignore")
-                .value_name("IGNORE")
-                .help("List of players to ignore separated by commas")
-                .takes_value(true)
-                .multiple(false)
-                .conflicts_with("target")
-                .required(false),
-        )
-        .arg(
-            Arg::with_name("target")
-                .short("t")
-                .long("target")
-                .value_name("TARGET")
-                .help("List of player to control separated by commas")
-                .takes_value(true)
-                .multiple(false)
-                .conflicts_with("ignore")
-                .required(false),
-        )
-        .get_matches();
+    // The order of extracting the flags, options and subcommands is important
+    // First we check for the help and version flags, and stop on those
+    // After that we extract the subcommand/action
+    // Then we will try to parse the options
+    // And as last option try to extract a fallback action to be compatible with the previous versions using clap
+    let mut args = Arguments::from_env();
 
-    let ignore = match matches.value_of("ignore") {
-        Some(i) => i,
-        None => "",
+    if args.contains(["-h", "--help"]) {
+        show_help();
+        std::process::exit(0);
+    }
+
+    if args.contains(["-V", "--version"]) {
+        println!("mpris-control {}", env!("CARGO_PKG_VERSION"));
+        std::process::exit(0);
+    }
+
+    let main_action = args.subcommand().unwrap_or_default();
+    let control_all = args.contains(["-a", "--all"]);
+    let ignore: Option<String> = args.opt_value_from_str(["-i", "--ignore"]).unwrap_or_default();
+    let target: Option<String> = args.opt_value_from_str(["-t", "--target"]).unwrap_or_default();
+    let fallback_action = args.opt_free_from_str::<String>().unwrap_or_default();
+
+    let action = match main_action {
+        Some(a) => a,
+        _ => match fallback_action {
+            Some(fa) => fa,
+            _ => {
+                eprintln!("No action found!\n");
+                show_help();
+                std::process::exit(1);
+            }
+        },
     };
 
-    let target = match matches.value_of("target") {
-        Some(i) => i,
-        None => "",
-    };
+    if action == "help" {
+        show_help();
+        std::process::exit(0);
+    }
 
-    let control_all = matches.is_present("control_all");
-
-    let action = matches.subcommand().0;
-    
     match run_action(action, ignore, target, control_all) {
         Ok(msg) => {
             println!("{}", msg);
-            println!();
         }
         Err(err) => {
             eprintln!("{}", err);
-            eprintln!();
         }
     }
 }
 
-fn run_action(action: &str, ignore: &str, target: &str, control_all: bool) -> Result<String, String> {
-    let player_finder =
-        PlayerFinder::new().map_err(|e| format!("Could not connect to D-Bus: {}", e))?;
+fn show_help() {
+    println!("mpris-control {}", env!("CARGO_PKG_VERSION"));
+    print!("{}", HELP);
+}
 
-    let mut players = player_finder
-        .find_all()
-        .map_err(|e| format!("Could not find any player: {}", e))?;
+fn run_action(
+    action: String,
+    ignore: Option<String>,
+    target: Option<String>,
+    control_all: bool,
+) -> Result<String, String> {
+    let player_finder = PlayerFinder::new().map_err(|e| format!("Could not connect to D-Bus: {}", e))?;
 
-    // 
+    let mut players = player_finder.find_all().map_err(|e| format!("Could not find any player: {}", e))?;
+
+    //
     if players.is_empty() {
         return Err("No MPRIS players found".to_string());
     }
@@ -93,20 +78,20 @@ fn run_action(action: &str, ignore: &str, target: &str, control_all: bool) -> Re
     // Check if we need to list all players which we can control, in which case we skip filtering.
     if !control_all {
         // Check if there are ignore or target values, of not, we only want one value, and we are going to be lazy (as does the mpris crate) and pick the first one in the list
-        if ignore.is_empty() && target.is_empty() {
+        if ignore.is_none() && target.is_none() {
             players.drain(1..);
 
         // Filter for the ignore values
-        } else if !ignore.is_empty() {
-            for ignore_player in ignore.split(',') {
+        } else if ignore.is_some() {
+            for ignore_player in ignore.unwrap().split(',') {
                 players.retain(|x| x.identity().to_lowercase() != ignore_player.to_lowercase());
             }
 
         // Filter for the target values
-        } else if !target.is_empty() {
+        } else if let Some(target_list) = target {
             players.retain(|x| {
                 let mut keep = false;
-                for target_player in target.split(',') {
+                for target_player in target_list.split(',') {
                     if x.identity().to_lowercase() == target_player.to_lowercase() {
                         keep = true;
                     }
@@ -131,29 +116,17 @@ fn run_action(action: &str, ignore: &str, target: &str, control_all: bool) -> Re
             controlled_players.push(player.identity().to_string());
 
             if action == "toggle" {
-                player
-                .play_pause()
-                .map_err(|e| format!("Could not control player: {}", e))?;
+                player.play_pause().map_err(|e| format!("Could not control player: {}", e))?;
             } else if action == "play" {
-                player
-                .play()
-                .map_err(|e| format!("Could not control player: {}", e))?;
+                player.play().map_err(|e| format!("Could not control player: {}", e))?;
             } else if action == "pause" {
-                player
-                .pause()
-                .map_err(|e| format!("Could not control player: {}", e))?;
+                player.pause().map_err(|e| format!("Could not control player: {}", e))?;
             } else if action == "next" {
-                player
-                .next()
-                .map_err(|e| format!("Could not control player: {}", e))?;
+                player.next().map_err(|e| format!("Could not control player: {}", e))?;
             } else if action == "previous" {
-                player
-                .previous()
-                .map_err(|e| format!("Could not control player: {}", e))?;
+                player.previous().map_err(|e| format!("Could not control player: {}", e))?;
             } else if action == "stop" {
-                player
-                .stop()
-                .map_err(|e| format!("Could not control player: {}", e))?;
+                player.stop().map_err(|e| format!("Could not control player: {}", e))?;
             } else {
                 return Err(format!("Unrecognized option: {}", action));
             }
@@ -164,3 +137,31 @@ fn run_action(action: &str, ignore: &str, target: &str, control_all: bool) -> Re
         Err("No players found".to_string())
     }
 }
+
+const HELP: &str = "\
+BlackDex (https://github.com/BlackDex/mpris-control/)
+Control MPRIS enabled media players
+
+USAGE:
+    mpris-control [FLAGS]|<SUBCOMMAND> [OPTIONS]
+
+FLAGS:
+    -h, --help       Prints help information
+    -V, --version    Prints version information
+
+OPTIONS:
+    -a, --all                Controll all players instead of only the filtered or first one
+    -i, --ignore <IGNORE>    List of players to ignore separated by commas
+    -t, --target <TARGET>    List of player to control separated by commas
+
+SUBCOMMANDS:
+    help        Prints this message or the help of the given subcommand(s)
+    list        List of players to be controlled (use --all to show all active players)
+    next        Next song
+    pause       Pause
+    play        Play
+    previous    Previous song
+    stop        Stop playback
+    toggle      Toggle playback
+
+";

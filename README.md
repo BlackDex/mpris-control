@@ -15,19 +15,19 @@ If you encounter any issues please report them in the issues section.<br>
 <br>
 **Simple usage:**
 ```bash
-mpris-control 0.3.1
+mpris-control 0.4.0
 BlackDex (https://github.com/BlackDex/mpris-control/)
 Control MPRIS enabled media players
 
 USAGE:
-    mpris-control [FLAGS] [OPTIONS] <SUBCOMMAND>
+    mpris-control [FLAGS]|<SUBCOMMAND> [OPTIONS]
 
 FLAGS:
-    -a, --all        Controll all players instead of only the filtered or first one
     -h, --help       Prints help information
     -V, --version    Prints version information
 
 OPTIONS:
+    -a, --all                Controll all players instead of only the filtered or first one
     -i, --ignore <IGNORE>    List of players to ignore separated by commas
     -t, --target <TARGET>    List of player to control separated by commas
 
@@ -47,25 +47,25 @@ SUBCOMMANDS:
 mpris-control play
 
 # List all the players it can find
-mpris-control --all list
+mpris-control list --all
 
 # Stop all players
-mpris-control --all stop
+mpris-control stop --all
 
 # Ignore specific players: This will ignore both VLC and Chromium, but triggers all others
-mpris-control --ignore "VLC media player","Chromium" play
+mpris-control play --ignore "VLC media player","Chromium"
 
 # Target specific players: This will target only Spotify
-mpris-control --target Spotify toggle
+mpris-control toggle --target Spotify
 
 # OR
-mpris-control --target Spotify,"VLC media player", pause
+mpris-control pause --target Spotify,"VLC media player"
 
 # To check if a filter works, you can use "list" command with the --target or --ignore options
-mpris-control --ignore Spotify list
+mpris-control list --ignore Spotify
 
 # OR
-mpris-control --target Spotify list
+mpris-control list --target Spotify
 
 ```
 

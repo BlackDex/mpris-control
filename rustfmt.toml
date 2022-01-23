@@ -1,0 +1,6 @@
+version = "Two"
+edition = "2021"
+max_width = 120
+newline_style = "Unix"
+use_small_heuristics = "Max"
+overflow_delimited_expr = true
