@@ -1,9 +1,9 @@
 [package]
 name = "mpris-control"
-version = "0.4.1"
+version = "0.4.2"
 authors = ["BlackDex"]
 edition = "2021"
-rust-version = "1.61"
+rust-version = "1.59.0"
 resolver = "2"
 
 repository = "https://github.com/BlackDex/mpris-control"
@@ -12,7 +12,7 @@ license = "GPL-3.0-only"
 publish = false
 
 [dependencies]
-mpris = "2.0.0-rc2"
+mpris = "2.0.0-rc3"
 pico-args = "0.5.0"
 
 [profile.release]
@@ -22,6 +22,3 @@ codegen-units = 1
 panic = "abort"
 rpath = false
 strip = true
-
-[patch.crates-io]
-mpris = { git = 'https://github.com/Mange/mpris-rs', rev = '8cfe48172d56ddf2b3256af78ad57be20a57540e' }
