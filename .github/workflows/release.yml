@@ -12,7 +12,7 @@ jobs:
     steps:
       # Checkout the repo
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       # End Checkout the repo
 
       # Install dependencies
@@ -22,44 +22,41 @@ jobs:
 
       # Enable Rust Caching
       - name: Enable Rust caching
-        uses: Swatinem/rust-cache@v1
+        uses: Swatinem/rust-cache@v2
       # End Enable Rust Caching
 
       # Uses the rust-toolchain file to determine version
       - name: Install Rust Toolchain
-        uses: actions-rs/toolchain@v1
+        uses: dtolnay/rust-toolchain@nightly
         with:
-          profile: minimal
           components: clippy, rustfmt
       # End Uses the rust-toolchain file to determine version
 
+      # Show environment
+      - name: "Show environment"
+        run: |
+          rustc -vV
+          cargo -vV
+      # End Show environment
+
       # Run cargo clippy, and fail on warnings (In release mode to speed up future builds)
       - name: cargo clippy
-        uses: actions-rs/cargo@v1
-        with:
-          command: clippy
-          args: --release -- -D warnings
+        run: clippy --release -- -D warnings
       # End Run cargo clippy
 
       # Run cargo fmt
       - name: cargo fmt
-        uses: actions-rs/cargo@v1
-        with:
-          command: fmt
-          args: --all -- --check
+        run: fmt --all -- --check
       # End Run cargo fmt
 
       # Build the binary
       - name: cargo build --release
-        uses: actions-rs/cargo@v1
-        with:
-          command: build
-          args: --release
+        run: build --release
       # End Build the binary
 
       # Upload artifact to Github Actions
       - name: Upload artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: mpris-control
           path: target/release/mpris-control

@@ -12,9 +12,13 @@
     clippy::equatable_if_let,
     clippy::float_cmp_const,
     clippy::inefficient_to_string,
+    clippy::iter_on_empty_collections,
+    clippy::iter_on_single_items,
     clippy::linkedlist,
     clippy::macro_use_imports,
     clippy::manual_assert,
+    clippy::manual_instant_elapsed,
+    clippy::manual_string_new,
     clippy::match_wildcard_for_single_variants,
     clippy::mem_forget,
     clippy::string_add_assign,
@@ -71,17 +75,17 @@ fn main() {
 
     match run_action(action, ignore, target, control_all) {
         Ok(msg) => {
-            println!("{}", msg);
+            println!("{msg}");
         }
         Err(err) => {
-            eprintln!("{}", err);
+            eprintln!("{err}");
         }
     }
 }
 
 fn show_help() {
     println!("mpris-control {}", env!("CARGO_PKG_VERSION"));
-    print!("{}", HELP);
+    print!("{HELP}");
 }
 
 fn run_action(
@@ -90,9 +94,9 @@ fn run_action(
     target: Option<String>,
     control_all: bool,
 ) -> Result<String, String> {
-    let player_finder = PlayerFinder::new().map_err(|e| format!("Could not connect to D-Bus: {}", e))?;
+    let player_finder = PlayerFinder::new().map_err(|e| format!("Could not connect to D-Bus: {e}"))?;
 
-    let mut players = player_finder.find_all().map_err(|e| format!("Could not find any player: {}", e))?;
+    let mut players = player_finder.find_all().map_err(|e| format!("Could not find any player: {e}"))?;
 
     //
     if players.is_empty() {
@@ -131,7 +135,7 @@ fn run_action(
         for player in players {
             println!(" - {:?}", player.identity());
         }
-        return Ok("".to_string());
+        return Ok(String::new());
     }
 
     if !players.is_empty() {
@@ -140,19 +144,19 @@ fn run_action(
             controlled_players.push(player.identity().to_string());
 
             if action == "toggle" {
-                player.play_pause().map_err(|e| format!("Could not control player: {}", e))?;
+                player.play_pause().map_err(|e| format!("Could not control player: {e}"))?;
             } else if action == "play" {
-                player.play().map_err(|e| format!("Could not control player: {}", e))?;
+                player.play().map_err(|e| format!("Could not control player: {e}"))?;
             } else if action == "pause" {
-                player.pause().map_err(|e| format!("Could not control player: {}", e))?;
+                player.pause().map_err(|e| format!("Could not control player: {e}"))?;
             } else if action == "next" {
-                player.next().map_err(|e| format!("Could not control player: {}", e))?;
+                player.next().map_err(|e| format!("Could not control player: {e}"))?;
             } else if action == "previous" {
-                player.previous().map_err(|e| format!("Could not control player: {}", e))?;
+                player.previous().map_err(|e| format!("Could not control player: {e}"))?;
             } else if action == "stop" {
-                player.stop().map_err(|e| format!("Could not control player: {}", e))?;
+                player.stop().map_err(|e| format!("Could not control player: {e}"))?;
             } else {
-                return Err(format!("Unrecognized option: {}", action));
+                return Err(format!("Unrecognized option: {action}"));
             }
         }
 

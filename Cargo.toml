@@ -1,9 +1,9 @@
 [package]
 name = "mpris-control"
-version = "0.4.2"
+version = "0.4.3"
 authors = ["BlackDex"]
 edition = "2021"
-rust-version = "1.59.0"
+rust-version = "1.66.1"
 resolver = "2"
 
 repository = "https://github.com/BlackDex/mpris-control"
@@ -12,7 +12,7 @@ license = "GPL-3.0-only"
 publish = false
 
 [dependencies]
-mpris = "2.0.0-rc3"
+mpris = "2.0.0"
 pico-args = "0.5.0"
 
 [profile.release]

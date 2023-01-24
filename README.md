@@ -15,7 +15,7 @@ If you encounter any issues please report them in the issues section.<br>
 <br>
 **Simple usage:**
 ```bash
-mpris-control 0.4.0
+mpris-control 0.4.3
 BlackDex (https://github.com/BlackDex/mpris-control/)
 Control MPRIS enabled media players
 
