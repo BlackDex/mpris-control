@@ -62,13 +62,6 @@ jobs:
           path: target/release/mpris-control
       # End Upload artifact to Github Actions
 
-      # Add binary to release
-      - name: Release binary
-        uses: softprops/action-gh-release@v1
-        with:
-          body: |
-            ${{ github.event.head_commit.message }}
-            (commit: ${{ github.sha }})
-          files: |
-            target/release/mpris-control
-      # End Add binary to release
+      # Release version
+      - name: Release tagged version
+        run: gh release create ${GITHUB_REF#refs/*/} -t ${GITHUB_REF#refs/*/} target/release/mpris-control --generate-notes
